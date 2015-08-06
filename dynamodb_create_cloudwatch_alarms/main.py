@@ -21,7 +21,7 @@ from docopt import docopt
 from boto.ec2.cloudwatch import MetricAlarm
 
 AWS_ACCESS_KEY_ID = 'youraccesskeyid'
-AWS_SECRET_ACCESS_KEY = 'youaccesskey'
+AWS_SECRET_ACCESS_KEY = 'youraccesskey'
 AWS_REGION = 'us-west-1'
 
 DEBUG = False
