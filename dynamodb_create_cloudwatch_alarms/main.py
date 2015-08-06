@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """dynamodb_create_cloudwatch_alarms
 
-Script used to create above 80% Read/Write Capacity Units 
+Script used to create above 80% Read/Write Capacity Units
 AWS CloudWatch alarms for each DynamoDB table.
 If set as a cron job - updates existing alarms if any of the DynamoDB table parameters changed.
 
