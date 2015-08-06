@@ -22,3 +22,8 @@ Examples:
     create_dynamodb_alarms
     create_dynamodb_alarms --debug
 ```
+
+# Install
+```bash
+$ pip install dynamodb-create-cloudwatch-alarms
+```
