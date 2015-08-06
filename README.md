@@ -17,7 +17,7 @@ Usage:
     dynamodb_create_cloudwatch_alarms [-h | --help]
 
 Options:
-     --debug   Don't send data to AWS
+    --debug   Don't send data to AWS
 
 Examples:
     dynamodb_create_cloudwatch_alarms
