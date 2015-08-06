@@ -8,4 +8,4 @@ test:
         parallel: true
         files:
           - dynamodb_create_cloudwatch_alarms/**/*.py
-    - dynamodb_create_cloudwatch_alarms --
+    - dynamodb_create_cloudwatch_alarms --help
