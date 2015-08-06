@@ -3,7 +3,8 @@
 
 Script used to create above 80% Read/Write Capacity Units
 AWS CloudWatch alarms for each DynamoDB table.
-If set as a cron job - updates existing alarms if any of the DynamoDB table parameters changed.
+If set as a cron job - updates existing alarms if
+Read/Write Capacity Units DynamoDB table parameters changed.
 
 
 Usage:
