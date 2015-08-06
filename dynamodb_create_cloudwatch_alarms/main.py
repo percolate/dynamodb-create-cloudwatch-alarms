@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""dynamodb-create-cloudwatch-alarms
+"""dynamodb_create_cloudwatch_alarms
 
 Script used to create above 80 pct. Read/Write Capacity Units
 alarms in AWS CloudWatch for each DynamoDB table.
@@ -7,8 +7,8 @@ Also updates existing alarms if the parameters changed.
 Will be run as a cron job.
 
 Usage:
-    dynamodb-create-cloudwatch-alarms [options]
-    dynamodb-create-cloudwatch-alarms [-h | --help]
+    dynamodb_create_cloudwatch_alarms [options]
+    dynamodb_create_cloudwatch_alarms [-h | --help]
 
 Options:
      --debug   Don't send data to AWS
@@ -20,9 +20,9 @@ import boto.dynamodb
 from docopt import docopt
 from boto.ec2.cloudwatch import MetricAlarm
 
-from settings import AWS_ACCESS_KEY_ID
-from settings import AWS_SECRET_ACCESS_KEY
-from settings import AWS_REGION
+AWS_ACCESS_KEY_ID = 'youraccesskeyid'
+AWS_SECRET_ACCESS_KEY = 'youaccesskey'
+AWS_REGION = 'us-west-1'
 
 DEBUG = False
 
@@ -135,7 +135,7 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect):
                 threshold=0.8*threshold*ALARM_PERIOD,
                 period=ALARM_PERIOD,
                 evaluation_periods=ALARM_EVALUATION_PERIOD,
-                ## Below insert the actions appropriate.
+                # Below insert the actions appropriate.
                 alarm_actions=[u'some_action'],
                 dimensions={u'TableName': table[0]})
 
