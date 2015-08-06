@@ -20,9 +20,9 @@ import boto.dynamodb
 from docopt import docopt
 from boto.ec2.cloudwatch import MetricAlarm
 
-from settings import AWS_ACCESS_KEY_ID
-from settings import AWS_SECRET_ACCESS_KEY
-from settings import AWS_REGION
+AWS_ACCESS_KEY_ID = 'youraccesskeyid'
+AWS_SECRET_ACCESS_KEY = 'youaccesskey'
+AWS_REGION = 'us-west-1'
 
 DEBUG = False
 
