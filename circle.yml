@@ -7,5 +7,5 @@ test:
     - flake8:
         parallel: true
         files:
-          - create_dynamodb_alarms/**/*.py
-    - create_dynamodb_alarms --
+          - dynamodb-create-cloudwatch-alarms/**/*.py
+    - dynamodb-create-cloudwatch-alarms --
