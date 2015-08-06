@@ -135,7 +135,7 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect):
                 threshold=0.8*threshold*ALARM_PERIOD,
                 period=ALARM_PERIOD,
                 evaluation_periods=ALARM_EVALUATION_PERIOD,
-                ## Below insert the actions appropriate.
+                # Below insert the actions appropriate.
                 alarm_actions=[u'some_action'],
                 dimensions={u'TableName': table[0]})
 

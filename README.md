@@ -6,24 +6,24 @@ Automate the creation of DynamoDB ProvisionedThroughput Read/Write Alarms.
 
 # Quick Start
 ```bash
-$ create_dynamodb_alarms --help
+$ dynamodb_create_cloudwatch_alarms --help
 
 Script used to create above 80 pct. Read/Write Capacity Units alarms in AWS CloudWatch for each DynamoDB table.
 Also updates existing alarms if the parameters changed.
 
 Usage:
-    create_dynamodb_alarms [options]
-    create_dynamodb_alarms [-h | --help]
+    dynamodb_create_cloudwatch_alarms [options]
+    dynamodb_create_cloudwatch_alarms [-h | --help]
 
 Options:
      --debug   Don't send data to AWS
 
 Examples:
-    create_dynamodb_alarms
-    create_dynamodb_alarms --debug
+    dynamodb_create_cloudwatch_alarms
+    dynamodb_create_cloudwatch_alarms --debug
 ```
 
 # Install
 ```bash
-$ pip install dynamodb-create-cloudwatch-alarms
+$ pip install dynamodb_create_cloudwatch_alarms
 ```
