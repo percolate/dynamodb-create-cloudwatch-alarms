@@ -58,7 +58,7 @@ def get_ddb_tables():
 
 def get_existing_alarm_names(aws_cw_connect):
     """
-    Retreives all DynamoDB related CloudWatch alarm names
+    Retrieves all DynamoDB related CloudWatch alarm names
 
     Args:
         aws_cw_connect (CloudWatchConnection)
