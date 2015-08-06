@@ -9,7 +9,8 @@ The ProvisionedThroughput upper-bound limit in the script is 80%, but this can b
 ```bash
 $ create_dynamodb_alarms --help
 
-Script used to create above 80 pct. Read/Write Capacity Units alarms in AWS CloudWatch for each DynamoDB table.
+Script used to create above 80% Read/Write Capacity Units alarms
+in AWS CloudWatch for each DynamoDB table.
 Also updates existing alarms if the parameters changed.
 
 Usage:
