@@ -34,7 +34,7 @@ ALARM_EVALUATION_PERIOD = 12
 
 def get_ddb_tables():
     """
-    Retreives all DynamoDB table names
+    Retrieves all DynamoDB table names
 
     Returns:
         (set) Of valid DynamoDB table names
