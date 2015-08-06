@@ -10,7 +10,7 @@ setup(
     author_email='mihailo@percolate.com',
     license='GPLv3',
     keywords='aws dynamodb alarms cloudwatch boto',
-    packages=['dynamodb-create-cloudwatch-alarms'],
+    packages=['dynamodb_create_cloudwatch_alarms'],
     install_requires=[
         'boto',
         'docopt'
@@ -18,7 +18,7 @@ setup(
     entry_points={
         'console_scripts': [
             ('dynamodb-create-cloudwatch-alarms='
-             'dynamodb-create-cloudwatch-alarms.main:main')
+             'dynamodb_create_cloudwatch_alarms.main:main')
         ]
     },
     classifiers=[
