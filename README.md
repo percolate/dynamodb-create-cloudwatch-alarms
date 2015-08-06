@@ -5,7 +5,6 @@
 Automate the creation of DynamoDB ProvisionedThroughput Read/Write Alarms.
 
 # Quick Start
-
 ```bash
 $ create_dynamodb_alarms --help
 
@@ -20,6 +19,6 @@ Options:
      --debug   Don't send data to AWS
 
 Examples:
-	create_dynamodb_alarms
-	create_dynamodb_alarms --debug
+    create_dynamodb_alarms
+    create_dynamodb_alarms --debug
 ```
