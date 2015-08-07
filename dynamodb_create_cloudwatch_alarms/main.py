@@ -15,15 +15,11 @@ Options:
      --debug   Don't send data to AWS
 
 """
-import os
+import boto
 import boto.ec2
 import boto.dynamodb
 from docopt import docopt
 from boto.ec2.cloudwatch import MetricAlarm
-
-AWS_ACCESS_KEY_ID = 'youraccesskeyid'
-AWS_SECRET_ACCESS_KEY = 'youraccesskey'
-AWS_REGION = 'us-west-1'
 
 DEBUG = False
 
@@ -40,7 +36,7 @@ def get_ddb_tables():
     Returns:
         (set) Of valid DynamoDB table names
     """
-    ddb_connection = boto.dynamodb.connect_to_region(AWS_REGION)
+    ddb_connection = boto.connect_dynamodb()
     ddb_tables_list = ddb_connection.list_tables()
     ddb_tables = set()
     for ddb_table in ddb_tables_list:
@@ -158,17 +154,11 @@ def main():
 
     global DEBUG
 
-    if 'AWS_ACCESS_KEY_ID' not in os.environ:
-        os.environ['AWS_ACCESS_KEY_ID'] = AWS_ACCESS_KEY_ID
-
-    if 'AWS_SECRET_ACCESS_KEY' not in os.environ:
-        os.environ['AWS_SECRET_ACCESS_KEY'] = AWS_SECRET_ACCESS_KEY
-
     if args['--debug']:
         DEBUG = True
 
     ddb_tables = get_ddb_tables()
-    aws_cw_connect = boto.ec2.cloudwatch.connect_to_region(AWS_REGION)
+    aws_cw_connect = boto.connect_cloudwatch()
 
     (alarms_to_create,
      alarms_to_update) = get_ddb_alarms_to_create(ddb_tables,
