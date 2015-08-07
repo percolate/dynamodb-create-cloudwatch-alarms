@@ -4,7 +4,7 @@ from setuptools import setup
 setup(
     name='dynamodb-create-cloudwatch-alarms',
     version='1.1',
-    description='AWS EC2 Security Groups dump tool',
+    description='AWS DynamoDB Tool for creating Metric Alarms',
     url='https://github.com/percolate/dynamodb-create-cloudwatch-alarms',
     author='Mihailo Pavlisin',
     author_email='mihailo@percolate.com',
@@ -17,8 +17,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            ('dynamodb-create-cloudwatch-alarms='
-             'dynamodb_create_cloudwatch_alarms.main:main')
+            'dynamodb-create-cloudwatch-alarms=dynamodb_create_cloudwatch_alarms.main:main'
         ]
     },
     classifiers=[
