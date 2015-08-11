@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""dynamodb_create_cloudwatch_alarms
+"""dynamodb-create-cloudwatch-alarms
 
 Script used to create above 80% Read/Write Capacity Units
 AWS CloudWatch alarms for each DynamoDB table.
@@ -8,8 +8,8 @@ Read/Write Capacity Units DynamoDB table parameters changed.
 
 
 Usage:
-    dynamodb_create_cloudwatch_alarms [options]
-    dynamodb_create_cloudwatch_alarms [-h | --help]
+    dynamodb-create-cloudwatch-alarms [options]
+    dynamodb-create-cloudwatch-alarms [-h | --help]
 
 Options:
      --debug   Don't send data to AWS
