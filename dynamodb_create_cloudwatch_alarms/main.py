@@ -8,25 +8,32 @@ Read/Write Capacity Units DynamoDB table parameters changed.
 
 
 Usage:
-    dynamodb-create-cloudwatch-alarms [options]
+    dynamodb-create-cloudwatch-alarms (-s <sns_topic_arn>) [-r <region>] [-p <prefix>] [--debug] 
     dynamodb-create-cloudwatch-alarms [-h | --help]
 
 Options:
-     --debug   Don't send data to AWS
+     -s <sns_topic_arn>    For sending alarm ( require )
+     -r <region>           AWS region
+     -p <prefix>           DynamoDB name prefix
+     --debug               Don't send data to AWS
 
 """
 import boto
 import boto.ec2
-import boto.dynamodb
+import boto.dynamodb2
 from docopt import docopt
 from boto.ec2.cloudwatch import MetricAlarm
 
 DEBUG = False
+AWS_REGION = u'ap-northeast-1'
+AWS_SNS_ARN = u''
+DYNAMO_PREF = u''
 
 DDB_METRICS = frozenset([u'ConsumedReadCapacityUnits',
                          u'ConsumedWriteCapacityUnits'])
 ALARM_PERIOD = 300
-ALARM_EVALUATION_PERIOD = 12
+ALARM_EVALUATION_PERIOD = 6
+RATE = 0.8
 
 
 def get_ddb_tables():
@@ -36,12 +43,17 @@ def get_ddb_tables():
     Returns:
         (set) Of valid DynamoDB table names
     """
-    ddb_connection = boto.connect_dynamodb()
+    ddb_connection = boto.dynamodb2.connect_to_region(AWS_REGION)
     ddb_tables_list = ddb_connection.list_tables()
+
     ddb_tables = set()
-    for ddb_table in ddb_tables_list:
+    for ddb_table in ddb_tables_list['TableNames']:
+
+        if DYNAMO_PREF and not ddb_table.startswith(DYNAMO_PREF):
+            continue
 
         ddb_table_attributes = ddb_connection.describe_table(ddb_table)
+
         # creating a variable for each unit to satisfy flake8
         ddb_tablename = ddb_table_attributes[u'Table'][u'TableName']
         ddb_rcu = (ddb_table_attributes
@@ -49,6 +61,16 @@ def get_ddb_tables():
         ddb_wcu = (ddb_table_attributes
                    [u'Table'][u'ProvisionedThroughput'][u'WriteCapacityUnits'])
         ddb_tables.add((ddb_tablename, ddb_rcu, ddb_wcu))
+
+        # GlobalSecondaryIndexes
+        if ddb_table_attributes[u'Table'].has_key(u'GlobalSecondaryIndexes'):
+            for ddb_global_index in ddb_table_attributes[u'Table'][u'GlobalSecondaryIndexes']:
+                ddb_indexname = ddb_global_index[u'IndexName']
+                ddb_rcu = (ddb_global_index
+                           [u'ProvisionedThroughput'][u'ReadCapacityUnits'])
+                ddb_wcu = (ddb_global_index
+                           [u'ProvisionedThroughput'][u'WriteCapacityUnits'])
+                ddb_tables.add((ddb_tablename, ddb_rcu, ddb_wcu, ddb_indexname))
 
     return ddb_tables
 
@@ -121,20 +143,24 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect):
             # initiate a MetricAlarm object for each DynamoDb table.
             # for the threshold we calculate the 80 percent
             # from the tables ProvisionedThroughput values
+            if len(table) > 3:
+                alarm_name = u'{0}-{1}-BasicAlarm'.format(table[0] + u'-' + table[3], metric.replace('Consumed', '') + 'Limit')
+                alarm_dimensions = {u'TableName': table[0], u'GlobalSecondaryIndexName': table[3]}
+            else:
+                alarm_name = u'{0}-{1}-BasicAlarm'.format(table[0], metric.replace('Consumed', '') + 'Limit')
+                alarm_dimensions = {u'TableName': table[0]}
+
             ddb_table_alarm = MetricAlarm(
-                name=u'{}-{}-BasicAlarm'.format(table[0],
-                                                (metric.
-                                                 replace('Consumed',
-                                                         '') + 'Limit')),
+                name=alarm_name,
                 namespace=u'AWS/DynamoDB',
-                metric=u'{}'.format(metric), statistic='Sum',
+                metric=u'{0}'.format(metric), statistic='Sum',
                 comparison=u'>=',
-                threshold=0.8*threshold*ALARM_PERIOD,
+                threshold=RATE*threshold*ALARM_PERIOD,
                 period=ALARM_PERIOD,
                 evaluation_periods=ALARM_EVALUATION_PERIOD,
                 # Below insert the actions appropriate.
-                alarm_actions=[u'some_action'],
-                dimensions={u'TableName': table[0]})
+                alarm_actions=[AWS_SNS_ARN],
+                dimensions=alarm_dimensions)
 
             # we create an Alarm metric for each new DDB table
             if ddb_table_alarm.name not in existing_alarms.iterkeys():
@@ -153,12 +179,23 @@ def main():
     args = docopt(__doc__)
 
     global DEBUG
+    global AWS_REGION
+    global AWS_SNS_ARN
+    global DYNAMO_PREF
+
+    AWS_SNS_ARN = args['-s']
 
     if args['--debug']:
         DEBUG = True
 
+    if args['-r']:
+        AWS_REGION = args['-r']
+
+    if args['-p']:
+        DYNAMO_PREF = args['-p']
+
     ddb_tables = get_ddb_tables()
-    aws_cw_connect = boto.connect_cloudwatch()
+    aws_cw_connect = boto.ec2.cloudwatch.connect_to_region(AWS_REGION)
 
     (alarms_to_create,
      alarms_to_update) = get_ddb_alarms_to_create(ddb_tables,
