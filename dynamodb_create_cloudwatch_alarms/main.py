@@ -126,8 +126,9 @@ def get_existing_alarm_names(aws_cw_connect):
 
     for existing_alarm in existing_alarms:
         if existing_alarm.namespace == u'AWS/DynamoDB':
-            existing_alarm_names.update({existing_alarm.name:
-                                         existing_alarm.threshold})
+            existing_alarm_names.update({existing_alarm.name: {
+                                         u'threshold': existing_alarm.threshold,
+                                         u'alarm_actions': existing_alarm.alarm_actions}})
 
     return existing_alarm_names
 
@@ -189,7 +190,8 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect):
             # update them if there are changes
             for key, value in existing_alarms.iteritems():
                 if (key == ddb_table_alarm.name
-                        and str(value) != str(ddb_table_alarm.threshold)):
+                        and (str(value[u'threshold']) != str(ddb_table_alarm.threshold)
+                        or value[u'alarm_actions'] != ddb_table_alarm.alarm_actions)):
                     alarms_to_update.add(ddb_table_alarm)
 
     return (alarms_to_create, alarms_to_update)
