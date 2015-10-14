@@ -169,7 +169,7 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect):
             # update them if there are changes
             for key, value in existing_alarms.iteritems():
                 if (key == ddb_table_alarm.name
-                        and value != ddb_table_alarm.threshold):
+                        and str(value) != str(ddb_table_alarm.threshold)):
                     alarms_to_update.add(ddb_table_alarm)
 
     return (alarms_to_create, alarms_to_update)
