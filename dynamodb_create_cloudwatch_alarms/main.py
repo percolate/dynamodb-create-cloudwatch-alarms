@@ -35,19 +35,39 @@ ALARM_PERIOD = 300
 ALARM_EVALUATION_PERIOD = 6
 RATE = 0.8
 
-
-def get_ddb_tables():
+def _get_ddb_tables_list(ddb_connection):
     """
     Retrieves all DynamoDB table names
 
     Returns:
         (set) Of valid DynamoDB table names
     """
-    ddb_connection = boto.dynamodb2.connect_to_region(AWS_REGION)
+
+    ddb_tables_list_all = []
+
     ddb_tables_list = ddb_connection.list_tables()
+    while ddb_tables_list.has_key(u'LastEvaluatedTableName'):
+        ddb_tables_list_all.extend(ddb_tables_list[u'TableNames'])
+        ddb_tables_list = ddb_connection.list_tables(exclusive_start_table_name=ddb_tables_list[u'LastEvaluatedTableName'])
+    else:
+        ddb_tables_list_all.extend(ddb_tables_list[u'TableNames'])
+
+    return ddb_tables_list_all
+
+
+def get_ddb_tables():
+    """
+    Retrieves all DynamoDB table describe
+
+    Returns:
+        (set) Of valid DynamoDB table describe list
+    """
+
+    ddb_connection = boto.dynamodb2.connect_to_region(AWS_REGION)
+    ddb_tables_list = _get_ddb_tables_list(ddb_connection)
 
     ddb_tables = set()
-    for ddb_table in ddb_tables_list['TableNames']:
+    for ddb_table in ddb_tables_list:
 
         if DYNAMO_PREF and not ddb_table.startswith(DYNAMO_PREF):
             continue
