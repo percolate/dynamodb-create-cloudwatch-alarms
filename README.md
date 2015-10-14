@@ -26,7 +26,7 @@ Options:
 
 ```
 
-# Install
+# Install and Usage
 ```bash
 $ git clone git@github.com:kentokento/dynamodb-create-cloudwatch-alarms.git
 $ cd ./dynamodb-create-cloudwatch-alarms
