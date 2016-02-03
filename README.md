@@ -26,10 +26,7 @@ Options:
 
 ```
 
-# Install and Usage
+# Install
 ```bash
-$ git clone git@github.com:kentokento/dynamodb-create-cloudwatch-alarms.git
-$ cd ./dynamodb-create-cloudwatch-alarms
-$ make develop
-$ dynamodb-create-cloudwatch-alarms -s arn:aws:sns:ap-northeast-1:xxxxxxxxxx:hoge
+$ pip install dynamodb_create_cloudwatch_alarms
 ```
