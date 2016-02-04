@@ -8,7 +8,7 @@ Read/Write Capacity Units DynamoDB table parameters changed.
 
 
 Usage:
-    dynamodb-create-cloudwatch-alarms (-s <sns_topic_arn>) [-r <region>] [-p <prefix>] [--debug] 
+    dynamodb-create-cloudwatch-alarms (-s <sns_topic_arn>) [options]
     dynamodb-create-cloudwatch-alarms [-h | --help]
 
 Options:
@@ -35,6 +35,7 @@ ALARM_PERIOD = 300
 ALARM_EVALUATION_PERIOD = 6
 RATE = 0.8
 
+
 def _get_ddb_tables_list(ddb_connection):
     """
     Retrieves all DynamoDB table names
@@ -46,9 +47,11 @@ def _get_ddb_tables_list(ddb_connection):
     ddb_tables_list_all = []
 
     ddb_tables_list = ddb_connection.list_tables()
-    while ddb_tables_list.has_key(u'LastEvaluatedTableName'):
+    while u'LastEvaluatedTableName' in ddb_tables_list:
         ddb_tables_list_all.extend(ddb_tables_list[u'TableNames'])
-        ddb_tables_list = ddb_connection.list_tables(exclusive_start_table_name=ddb_tables_list[u'LastEvaluatedTableName'])
+        ddb_tables_list = ddb_connection.list_tables(
+                exclusive_start_table_name=ddb_tables_list
+                [u'LastEvaluatedTableName'])
     else:
         ddb_tables_list_all.extend(ddb_tables_list[u'TableNames'])
 
@@ -82,15 +85,16 @@ def get_ddb_tables():
                    [u'Table'][u'ProvisionedThroughput'][u'WriteCapacityUnits'])
         ddb_tables.add((ddb_tablename, ddb_rcu, ddb_wcu))
 
-        # GlobalSecondaryIndexes
-        if ddb_table_attributes[u'Table'].has_key(u'GlobalSecondaryIndexes'):
-            for ddb_global_index in ddb_table_attributes[u'Table'][u'GlobalSecondaryIndexes']:
-                ddb_indexname = ddb_global_index[u'IndexName']
-                ddb_rcu = (ddb_global_index
-                           [u'ProvisionedThroughput'][u'ReadCapacityUnits'])
-                ddb_wcu = (ddb_global_index
-                           [u'ProvisionedThroughput'][u'WriteCapacityUnits'])
-                ddb_tables.add((ddb_tablename, ddb_rcu, ddb_wcu, ddb_indexname))
+        # check GlobalSecondaryIndexes
+        if u'GlobalSecondaryIndexes' not in ddb_table_attributes[u'Table']:
+            continue
+
+        gsi_list = ddb_table_attributes[u'Table'][u'GlobalSecondaryIndexes']
+        for gsi in gsi_list:
+            ddb_indexname = gsi[u'IndexName']
+            ddb_rcu = (gsi[u'ProvisionedThroughput'][u'ReadCapacityUnits'])
+            ddb_wcu = (gsi[u'ProvisionedThroughput'][u'WriteCapacityUnits'])
+            ddb_tables.add((ddb_tablename, ddb_rcu, ddb_wcu, ddb_indexname))
 
     return ddb_tables
 
@@ -127,8 +131,8 @@ def get_existing_alarm_names(aws_cw_connect):
     for existing_alarm in existing_alarms:
         if existing_alarm.namespace == u'AWS/DynamoDB':
             existing_alarm_names.update({existing_alarm.name: {
-                                         u'threshold': existing_alarm.threshold,
-                                         u'alarm_actions': existing_alarm.alarm_actions}})
+                     u'threshold': existing_alarm.threshold,
+                     u'alarm_actions': existing_alarm.alarm_actions}})
 
     return existing_alarm_names
 
@@ -165,10 +169,16 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect):
             # for the threshold we calculate the 80 percent
             # from the tables ProvisionedThroughput values
             if len(table) > 3:
-                alarm_name = u'{0}-{1}-BasicAlarm'.format(table[0] + u'-' + table[3], metric.replace('Consumed', '') + 'Limit')
-                alarm_dimensions = {u'TableName': table[0], u'GlobalSecondaryIndexName': table[3]}
+                alarm_name = u'{0}-{1}-BasicAlarm'.format(
+                        table[0] + u'-' + table[3],
+                        metric.replace('Consumed', '') + 'Limit')
+                alarm_dimensions = {
+                        u'TableName': table[0],
+                        u'GlobalSecondaryIndexName': table[3]}
             else:
-                alarm_name = u'{0}-{1}-BasicAlarm'.format(table[0], metric.replace('Consumed', '') + 'Limit')
+                alarm_name = u'{0}-{1}-BasicAlarm'.format(
+                        table[0],
+                        metric.replace('Consumed', '') + 'Limit')
                 alarm_dimensions = {u'TableName': table[0]}
 
             ddb_table_alarm = MetricAlarm(
@@ -189,9 +199,12 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect):
             # checking the existing alarms thresholds
             # update them if there are changes
             for key, value in existing_alarms.iteritems():
-                if (key == ddb_table_alarm.name
-                        and (str(value[u'threshold']) != str(ddb_table_alarm.threshold)
-                        or value[u'alarm_actions'] != ddb_table_alarm.alarm_actions)):
+                if key != ddb_table_alarm.name:
+                    continue
+
+                if str(value[u'threshold']) != str(ddb_table_alarm.threshold):
+                    alarms_to_update.add(ddb_table_alarm)
+                elif value[u'alarm_actions'] != ddb_table_alarm.alarm_actions:
                     alarms_to_update.add(ddb_table_alarm)
 
     return (alarms_to_create, alarms_to_update)
