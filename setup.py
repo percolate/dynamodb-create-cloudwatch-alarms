@@ -1,9 +1,10 @@
 from setuptools import setup
+from dynamodb_create_cloudwatch_alarms.constants import VERSION
 
 
 setup(
     name='dynamodb-create-cloudwatch-alarms',
-    version='1.1',
+    version=VERSION,
     description='AWS DynamoDB Tool for creating Metric Alarms',
     url='https://github.com/percolate/dynamodb-create-cloudwatch-alarms',
     author='Mihailo Pavlisin',

@@ -8,18 +8,22 @@ Read/Write Capacity Units DynamoDB table parameters changed.
 
 
 Usage:
-    dynamodb-create-cloudwatch-alarms [options]
+    dynamodb-create-cloudwatch-alarms [options] <sns_topic_arn> <region>
     dynamodb-create-cloudwatch-alarms [-h | --help]
 
 Options:
-     --debug   Don't send data to AWS
+    --debug    Don't send data to AWS.
+    --version  Show version.
 
 """
 import boto
 import boto.ec2
+import boto.ec2.cloudwatch
 import boto.dynamodb
 from docopt import docopt
 from boto.ec2.cloudwatch import MetricAlarm
+
+from constants import VERSION
 
 DEBUG = False
 
@@ -29,14 +33,19 @@ ALARM_PERIOD = 300
 ALARM_EVALUATION_PERIOD = 12
 
 
-def get_ddb_tables():
+def get_ddb_tables(region):
     """
     Retrieves all DynamoDB table names
+
+    Args:
+        region (str)
 
     Returns:
         (set) Of valid DynamoDB table names
     """
-    ddb_connection = boto.connect_dynamodb()
+    assert isinstance(region, str)
+
+    ddb_connection = boto.dynamodb.connect_to_region(region)
     ddb_tables_list = ddb_connection.list_tables()
     ddb_tables = set()
     for ddb_table in ddb_tables_list:
@@ -90,7 +99,7 @@ def get_existing_alarm_names(aws_cw_connect):
     return existing_alarm_names
 
 
-def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect):
+def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect, sns_topic_arn):
     """
     Creates a Read/Write Capacity Units alarm
     for all DynamoDB tables
@@ -98,6 +107,7 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect):
     Args:
         ddb_tables (set) ist of all DynamoDB tables
         aws_cw_connect (CloudWatchConnection)
+        sns_topic_arn (str)
 
     Returns:
         (set) All new Read/Write Capacity Units alarms that'll be created
@@ -106,6 +116,7 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect):
     assert isinstance(ddb_tables, set)
     assert isinstance(aws_cw_connect,
                       boto.ec2.cloudwatch.CloudWatchConnection)
+    assert isinstance(sns_topic_arn, str)
 
     alarms_to_create = set()
     alarms_to_update = set()
@@ -133,7 +144,7 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect):
                 period=ALARM_PERIOD,
                 evaluation_periods=ALARM_EVALUATION_PERIOD,
                 # Below insert the actions appropriate.
-                alarm_actions=[u'some_action'],
+                alarm_actions=[sns_topic_arn],
                 dimensions={u'TableName': table[0]})
 
             # we create an Alarm metric for each new DDB table
@@ -150,19 +161,24 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect):
 
 
 def main():
-    args = docopt(__doc__)
+    args = docopt(__doc__, version=VERSION)
 
     global DEBUG
 
     if args['--debug']:
         DEBUG = True
 
-    ddb_tables = get_ddb_tables()
-    aws_cw_connect = boto.connect_cloudwatch()
+    region = args['<region>']
+
+    sns_topic_arn = args['<sns_topic_arn>']
+
+    ddb_tables = get_ddb_tables(region)
+    aws_cw_connect = boto.ec2.cloudwatch.connect_to_region(region)
 
     (alarms_to_create,
      alarms_to_update) = get_ddb_alarms_to_create(ddb_tables,
-                                                  aws_cw_connect)
+                                                  aws_cw_connect,
+                                                  sns_topic_arn)
 
     # Creating new alarms
     if alarms_to_create:
@@ -172,8 +188,8 @@ def main():
         else:
             print 'New DynamoDB table(s) Alarms created:'
             for alarm in alarms_to_create:
-                aws_cw_connect.create_alarm(alarm)
                 print alarm
+                aws_cw_connect.create_alarm(alarm)
 
     # Updating existing alarms
     if alarms_to_update:
@@ -183,8 +199,8 @@ def main():
         else:
             print 'DynamoDB table(s) Alarms updated:'
             for alarm in alarms_to_update:
-                aws_cw_connect.update_alarm(alarm)
                 print alarm
+                aws_cw_connect.update_alarm(alarm)
 
 if __name__ == '__main__':
 
