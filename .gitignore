@@ -1,2 +1,3 @@
 *.pyc
 /dynamodb_create_cloudwatch_alarms.egg-info/
+/dist/
