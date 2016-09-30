@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 """dynamodb-create-cloudwatch-alarms
 
-Script that creates Read/Write ThrottleEvents
-AWS CloudWatch alarms for each DynamoDB table.
-Can be set as a cron job.
+Script that creates AWS CloudWatch alarms Read/Write ThrottleEvents
+for each DynamoDB table. Can be set as a cron job.
 
 Usage:
     dynamodb-create-cloudwatch-alarms [options] <sns_topic_arn> <region>
@@ -47,7 +46,6 @@ def get_ddb_tables(region):
     ddb_connection = boto.dynamodb.connect_to_region(region)
     ddb_tables_list = ddb_connection.list_tables()
     ddb_tables = set()
-
     for ddb_table in ddb_tables_list:
 
         ddb_table_attributes = ddb_connection.describe_table(ddb_table)
