@@ -8,8 +8,6 @@ set to 0.
 
 # Quick Start
 ```bash
-$ dynamodb_create_cloudwatch_alarms --help
-
 Script that creates AWS CloudWatch alarms Read/Write ThrottleEvents
 for each DynamoDB table. Can be set as a cron job.
 
