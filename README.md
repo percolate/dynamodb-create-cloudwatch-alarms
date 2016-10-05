@@ -20,8 +20,8 @@ Options:
     --version  Show version.
 
 Examples:
-    dynamodb_create_cloudwatch_alarms some_sns_topic some_region
-    dynamodb_create_cloudwatch_alarms some_sns_topic some_region --debug
+    dynamodb_create_cloudwatch_alarms arn:aws:sns:us-west-2:123456789012:dynamodb us-west-2
+    dynamodb_create_cloudwatch_alarms arn:aws:sns:us-west-2:123456789012:dynamodb us-west-2 --debug
     dynamodb_create_cloudwatch_alarms --version
 ```
 
