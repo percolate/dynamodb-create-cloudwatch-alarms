@@ -20,12 +20,12 @@ Options:
     --version  Show version.
 
 Examples:
-    dynamodb_create_cloudwatch_alarms arn:aws:sns:us-west-2:123456789012:dynamodb us-west-2
-    dynamodb_create_cloudwatch_alarms arn:aws:sns:us-west-2:123456789012:dynamodb us-west-2 --debug
-    dynamodb_create_cloudwatch_alarms --version
+    dynamodb-create-cloudwatch-alarms arn:aws:sns:us-west-2:123456789012:dynamodb us-west-2
+    dynamodb-create-cloudwatch-alarms arn:aws:sns:us-west-2:123456789012:dynamodb us-west-2 --debug
+    dynamodb-create-cloudwatch-alarms --version
 ```
 
 # Install
 ```bash
-$ pip install dynamodb_create_cloudwatch_alarms
+$ pip install dynamodb-create-cloudwatch-alarms
 ```
