@@ -2,31 +2,30 @@
 
 [![Circle CI](https://circleci.com/gh/percolate/dynamodb-create-cloudwatch-alarms.svg?style=svg)](https://circleci.com/gh/percolate/dynamodb-create-cloudwatch-alarms)
 
-Automate the creation of DynamoDB ProvisionedThroughput Read/Write Alarms.
-The `ProvisionedThroughput` upper-bound limit in the script is 80%, but this can be altered.
+Automate the creation of DynamoDB Read/Write ThrottleEvents Alarms.
+We want to know the first occurrence of a ThrottleEvent, so the threshold is
+set to 0.
 
 # Quick Start
 ```bash
-$ dynamodb_create_cloudwatch_alarms --help
-
-Script used to create above 80% Read/Write Capacity Units
-AWS CloudWatch alarms for each DynamoDB table.
-If set as a cron job - updates existing alarms if
-Read/Write Capacity Units DynamoDB table parameters changed.
+Script that creates AWS CloudWatch alarms Read/Write ThrottleEvents
+for each DynamoDB table. Can be set as a cron job.
 
 Usage:
-    dynamodb_create_cloudwatch_alarms [options]
-    dynamodb_create_cloudwatch_alarms [-h | --help]
+    dynamodb-create-cloudwatch-alarms [options] <sns_topic_arn> <region>
+    dynamodb-create-cloudwatch-alarms [-h | --help]
 
 Options:
-    --debug   Don't send data to AWS
-    
+    --debug    Don't send data to AWS.
+    --version  Show version.
+
 Examples:
-    dynamodb_create_cloudwatch_alarms
-    dynamodb_create_cloudwatch_alarms --debug
+    dynamodb-create-cloudwatch-alarms arn:aws:sns:us-west-2:123456789012:dynamodb us-west-2
+    dynamodb-create-cloudwatch-alarms arn:aws:sns:us-west-2:123456789012:dynamodb us-west-2 --debug
+    dynamodb-create-cloudwatch-alarms --version
 ```
 
 # Install
 ```bash
-$ pip install dynamodb_create_cloudwatch_alarms
+$ pip install dynamodb-create-cloudwatch-alarms
 ```
