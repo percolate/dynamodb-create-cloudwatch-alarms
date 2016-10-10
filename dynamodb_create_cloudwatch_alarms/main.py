@@ -28,7 +28,7 @@ DDB_METRICS = frozenset([u'WriteThrottleEvents',
                          u'ReadThrottleEvents'])
 
 ALARM_PERIOD = 300
-ALARM_EVALUATION_PERIOD = 3
+ALARM_EVALUATION_PERIOD = 5
 
 
 def get_ddb_tables(region):
