@@ -119,9 +119,9 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect, sns_topic_arn):
                 name=u'{}-{}-BasicAlarm'.format(
                     table, metric),
                 namespace=u'AWS/DynamoDB',
-                metric=u'{}'.format(metric), statistic='Sum',
+                metric=u'{}'.format(metric), statistic='Average',
                 comparison=u'>=',
-                threshold=0,
+                threshold=1,
                 period=ALARM_PERIOD,
                 evaluation_periods=ALARM_EVALUATION_PERIOD,
                 # Below insert the actions appropriate.
