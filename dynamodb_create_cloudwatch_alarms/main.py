@@ -5,7 +5,7 @@ Script that creates AWS CloudWatch alarms Read/Write ThrottleEvents
 for each DynamoDB table. Can be set as a cron job.
 
 Usage:
-    dynamodb-create-cloudwatch-alarms [options] <sns_topic_arn> <region>
+    dynamodb-create-cloudwatch-alarms [options] <threshold> <period> <eval_period> <sns_topic_arn> <region>
     dynamodb-create-cloudwatch-alarms [-h | --help]
 
 Options:
@@ -26,9 +26,6 @@ DEBUG = False
 
 DDB_METRICS = frozenset([u'WriteThrottleEvents',
                          u'ReadThrottleEvents'])
-
-ALARM_PERIOD = 300
-ALARM_EVALUATION_PERIOD = 5
 
 
 def get_ddb_tables(region):
@@ -92,7 +89,13 @@ def get_existing_alarm_names(aws_cw_connect):
     return existing_alarm_names
 
 
-def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect, sns_topic_arn):
+def get_ddb_alarms_to_create(
+        ddb_tables,
+        aws_cw_connect,
+        sns_topic_arn,
+        period,
+        eval_period,
+        threshold):
     """
     Creates a Read/Write ThrottleEvents alarms for all DynamoDB tables
 
@@ -100,6 +103,9 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect, sns_topic_arn):
         ddb_tables (set) ist of all DynamoDB tables
         aws_cw_connect (CloudWatchConnection)
         sns_topic_arn (str)
+        period (int)
+        eval_period (int)
+        threshold (int)
 
     Returns:
         (set) All new Read/Write ThrottleEvents alarms that'll be created
@@ -108,6 +114,9 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect, sns_topic_arn):
     assert isinstance(aws_cw_connect,
                       boto.ec2.cloudwatch.CloudWatchConnection)
     assert isinstance(sns_topic_arn, str)
+    assert isinstance(period, int)
+    assert isinstance(eval_period, int)
+    assert isinstance(threshold, int)
 
     alarms_to_create = set()
     existing_alarms = get_existing_alarm_names(aws_cw_connect)
@@ -116,17 +125,17 @@ def get_ddb_alarms_to_create(ddb_tables, aws_cw_connect, sns_topic_arn):
         # we want two alarms per DynamoDB table
         for metric in DDB_METRICS:
             ddb_table_alarm = MetricAlarm(
-                name=u'{}-{}-BasicAlarm'.format(
+                name='{}-{}-BasicAlarm'.format(
                     table, metric),
-                namespace=u'AWS/DynamoDB',
-                metric=u'{}'.format(metric), statistic='Average',
-                comparison=u'>=',
-                threshold=1,
-                period=ALARM_PERIOD,
-                evaluation_periods=ALARM_EVALUATION_PERIOD,
+                namespace='AWS/DynamoDB',
+                metric='{}'.format(metric), statistic='Average',
+                comparison='>=',
+                threshold=threshold,
+                period=period,
+                evaluation_periods=eval_period,
                 # Below insert the actions appropriate.
                 alarm_actions=[sns_topic_arn],
-                dimensions={u'TableName': table})
+                dimensions={'TableName': table})
 
             # we create an Alarm metric for each new DDB table
             if ddb_table_alarm.name not in existing_alarms:
@@ -143,8 +152,10 @@ def main():
     if args['--debug']:
         DEBUG = True
 
+    threshold = int(args['<threshold>'])
+    period = int(args['<period>'])
+    eval_period = int(args['<eval_period>'])
     region = args['<region>']
-
     sns_topic_arn = args['<sns_topic_arn>']
 
     ddb_tables = get_ddb_tables(region)
@@ -152,7 +163,10 @@ def main():
 
     alarms_to_create = get_ddb_alarms_to_create(ddb_tables,
                                                 aws_cw_connect,
-                                                sns_topic_arn)
+                                                sns_topic_arn,
+                                                period,
+                                                eval_period,
+                                                threshold)
     # Creating new alarms
     if alarms_to_create:
         if DEBUG:
