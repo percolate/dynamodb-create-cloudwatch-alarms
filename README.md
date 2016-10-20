@@ -10,7 +10,8 @@ Script that creates AWS CloudWatch alarms Read/Write ThrottleEvents
 for each DynamoDB table. Can be set as a cron job.
 
 Usage:
-    dynamodb-create-cloudwatch-alarms [options] <threshold> <period> <eval_period> <sns_topic_arn> <region>
+    dynamodb-create-cloudwatch-alarms [options] <threshold> <period>
+        <eval_period> <sns_topic_arn> <region>
     dynamodb-create-cloudwatch-alarms [-h | --help]
 
 Options:
