@@ -3,8 +3,6 @@
 [![Circle CI](https://circleci.com/gh/percolate/dynamodb-create-cloudwatch-alarms.svg?style=svg)](https://circleci.com/gh/percolate/dynamodb-create-cloudwatch-alarms)
 
 Automate the creation of DynamoDB Read/Write ThrottleEvents Alarms.
-We want to know the first occurrence of a ThrottleEvent, so the threshold is
-set to 1.
 
 # Quick Start
 ```bash
