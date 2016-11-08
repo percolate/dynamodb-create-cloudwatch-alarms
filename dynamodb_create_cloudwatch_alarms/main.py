@@ -18,6 +18,7 @@ Options:
      --debug               Don't send data to AWS
 
 """
+import time
 import boto
 import boto.ec2
 import boto.dynamodb2
@@ -31,9 +32,9 @@ DYNAMO_PREF = u''
 
 DDB_METRICS = frozenset([u'ConsumedReadCapacityUnits',
                          u'ConsumedWriteCapacityUnits'])
-ALARM_PERIOD = 300
-ALARM_EVALUATION_PERIOD = 6
-RATE = 0.8
+ALARM_PERIOD = 60
+ALARM_EVALUATION_PERIOD = 5
+RATE = 0.9
 
 
 def _get_ddb_tables_list(ddb_connection):
@@ -236,6 +237,17 @@ def main():
      alarms_to_update) = get_ddb_alarms_to_create(ddb_tables,
                                                   aws_cw_connect)
 
+    def __counter(x):
+        i = [x]
+        def __count():
+            i[0] += 1
+            if i[0] > 10:
+                time.sleep(5)
+                i[0] = 1
+            return i[0]
+        return __count
+
+    c = __counter(0)
     # Creating new alarms
     if alarms_to_create:
         if DEBUG:
@@ -244,6 +256,7 @@ def main():
         else:
             print 'New DynamoDB table(s) Alarms created:'
             for alarm in alarms_to_create:
+                c()
                 aws_cw_connect.create_alarm(alarm)
                 print alarm
 
@@ -255,6 +268,7 @@ def main():
         else:
             print 'DynamoDB table(s) Alarms updated:'
             for alarm in alarms_to_update:
+                c()
                 aws_cw_connect.update_alarm(alarm)
                 print alarm
 
