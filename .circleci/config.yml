@@ -1,0 +1,51 @@
+version: 2
+jobs:
+
+  mdl:
+    docker:
+      - image: rsrchboy/mdl
+    steps:
+      - checkout
+      - run: mdl .
+
+  flake8-py2:
+    docker:
+      - image: python:2
+    steps:
+      - run: pip install flake8
+      - checkout
+      - run: flake8
+
+  flake8:
+    docker:
+      - image: python
+    steps:
+      - run: pip install flake8
+      - checkout
+      - run: flake8
+
+  cli-py2:
+    docker:
+      - image: python:2
+    steps:
+      - checkout
+      - run: python setup.py install
+      - run: dynamodb-create-cloudwatch-alarms --help
+
+  cli:
+    docker:
+      - image: python
+    steps:
+      - checkout
+      - run: python setup.py install
+      - run: dynamodb-create-cloudwatch-alarms --help
+
+workflows:
+  version: 2
+  rds-create-cpu-alarms:
+    jobs:
+      - mdl
+      - flake8-py2
+      - flake8
+      - cli-py2
+      - cli
