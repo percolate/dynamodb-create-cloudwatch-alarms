@@ -172,13 +172,13 @@ def main():
     if alarms_to_create:
         if DEBUG:
             for alarm in alarms_to_create:
-                print 'DEBUG CREATED:', alarm
+                print('DEBUG CREATED:', alarm)
         else:
-            print 'New DynamoDB table(s) Alarms created:'
+            print('New DynamoDB table(s) Alarms created:')
             for alarm in alarms_to_create:
-                print alarm
+                print(alarm)
                 aws_cw_connect.create_alarm(alarm)
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     main()

@@ -18,7 +18,8 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'dynamodb-create-cloudwatch-alarms=dynamodb_create_cloudwatch_alarms.main:main'
+            ('dynamodb-create-cloudwatch-alarms='
+             'dynamodb_create_cloudwatch_alarms.main:main')
         ]
     },
     classifiers=[
