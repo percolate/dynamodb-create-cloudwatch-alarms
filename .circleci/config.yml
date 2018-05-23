@@ -42,7 +42,7 @@ jobs:
 
 workflows:
   version: 2
-  rds-create-cpu-alarms:
+  dynamodb-create-cloudwatch-alarms:
     jobs:
       - mdl
       - flake8-py2
